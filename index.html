@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mensagem urgente 💧</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💧</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Caveat:wght@600&display=swap" rel="stylesheet">
+    <style>
+        /* =========================================================
+           CORES (variáveis CSS)
+           ========================================================= */
+        :root {
+            --fundo:  #0E1820;   /* fundo da página: azul quase preto */
+            --papel:  #1A2733;   /* parte de dentro do cartão */
+            --capa:   #17344C;   /* capa do cartão */
+            --capa-2: #10263A;   /* lado de dentro da capa */
+            --tinta:  #E4EEF5;   /* texto claro */
+            --azul:   #5BBDF0;   /* azul-água: destaques e botão */
+            --coral:  #F0644F;   /* carimbo de "urgente" */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            color: var(--tinta);
+            background-color: var(--fundo);
+            /* bolinhas de fundo, como gotinhas */
+            background-image: radial-gradient(rgba(91, 189, 240, 0.10) 2px, transparent 2px);
+            background-size: 26px 26px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 16px;
+            overflow-x: hidden;
+        }
+
+        /* =========================================================
+           O CARTÃO
+           ========================================================= */
+        .cartao {
+            position: relative;
+            width: min(92vw, 400px);
+            height: 580px;
+            perspective: 1400px;   /* dá profundidade ao abrir a capa */
+        }
+
+        /* ---------- Parte de dentro ---------- */
+        .miolo {
+            position: absolute;
+            inset: 0;
+            background-color: var(--papel);
+            border-radius: 18px;
+            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.45);
+            padding: 26px 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 14px;
+        }
+
+        .miolo h2 {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--azul);
+            border: 2px solid var(--azul);
+            border-radius: 6px;
+            padding: 2px 10px;
+        }
+
+        .miolo .texto {
+            font-size: 19px;
+            line-height: 1.4;
+        }
+
+        .assinatura {
+            font-family: 'Caveat', cursive;
+            font-size: 24px;
+            color: var(--azul);
+        }
+
+        .botoes {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .bebi {
+            font-family: inherit;
+            font-size: 19px;
+            font-weight: 600;
+            color: #0B1620;
+            background-color: var(--azul);
+            border: none;
+            border-radius: 999px;
+            padding: 12px 26px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #2A7FAE;
+        }
+
+        .bebi:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #2A7FAE;
+        }
+
+        /* Botões desativados enquanto o envelope está fechado */
+        button:disabled {
+            cursor: default;
+            opacity: 0.5;
+        }
+
+        /* O botão que foge */
+        .fujao {
+            font-family: inherit;
+            font-size: 15px;
+            color: var(--tinta);
+            background-color: transparent;
+            border: 2px dashed #5E7689;
+            border-radius: 999px;
+            padding: 6px 16px;
+            cursor: pointer;
+            position: relative;
+            z-index: 3;   /* fica por cima do texto quando foge */
+            transition: transform 0.2s ease;
+        }
+
+        /* ---------- Capa ---------- */
+        .capa {
+            position: absolute;
+            inset: 0;
+            transform-origin: left center;   /* gira como a capa de um livro */
+            transform-style: preserve-3d;
+            transition: transform 1.1s cubic-bezier(.6, .05, .3, 1), opacity 0.4s 0.8s;
+            cursor: pointer;
+            z-index: 5;
+        }
+
+        .lado {
+            position: absolute;
+            inset: 0;
+            border-radius: 18px;
+            backface-visibility: hidden;   /* esconde o lado de trás enquanto gira */
+        }
+
+        .frente {
+            background-color: var(--capa);
+            background-image: radial-gradient(rgba(255, 255, 255, 0.07) 3px, transparent 3px);
+            background-size: 22px 22px;
+            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            color: white;
+            text-align: center;
+            padding: 24px;
+        }
+
+        .verso {
+            background-color: var(--capa-2);
+            transform: rotateY(180deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Caveat', cursive;
+            font-size: 30px;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .carimbo {
+            position: absolute;
+            top: 20px;
+            left: 18px;
+            font-weight: 600;
+            font-size: 18px;
+            color: var(--coral);
+            border: 3px solid var(--coral);
+            border-radius: 8px;
+            padding: 2px 12px;
+            transform: rotate(-8deg);
+        }
+
+        /* ---------- O cachorrinho falando ---------- */
+        .cachorro {
+            position: relative;
+            margin-top: 22px;
+        }
+
+        /* Ele "pula" na tela logo depois que a capa abre */
+        .cartao.aberto .cachorro {
+            animation: aparece 0.6s 0.7s cubic-bezier(.3, 1.6, .5, 1) backwards;
+        }
+
+        @keyframes aparece {
+            from { transform: scale(0) rotate(-20deg); }
+        }
+
+        .cachorro.contente {
+            animation: pula 0.5s ease 2 !important;
+        }
+
+        /* Foto redonda. O 🐶 fica por baixo: se a foto não carregar, ele aparece. */
+        .foto-cachorro {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 4px solid var(--azul);
+            background-color: var(--capa-2);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 70px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
+        }
+
+        .foto-cachorro img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Balão de fala */
+        .balao {
+            position: absolute;
+            top: -18px;
+            left: 100px;
+            background-color: white;
+            color: #123047;
+            font-family: 'Caveat', cursive;
+            font-size: 26px;
+            line-height: 1;
+            padding: 7px 14px;
+            border-radius: 18px;
+            white-space: nowrap;
+            transform: rotate(5deg);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
+            animation: fala 1.8s ease-in-out infinite;
+        }
+
+        /* A "pontinha" do balão, apontando para o cachorro */
+        .balao::after {
+            content: "";
+            position: absolute;
+            left: 16px;
+            bottom: -12px;
+            border-style: solid;
+            border-width: 14px 12px 0 0;
+            border-color: white transparent transparent transparent;
+        }
+
+        @keyframes fala {
+            50% { transform: rotate(5deg) scale(1.06); }
+        }
+
+        /* Cachorrinho sério da capa: um pouco maior e sem balão */
+        .frente .foto-cachorro {
+            width: 210px;
+            height: 210px;
+        }
+
+        .frente p {
+            font-size: 25px;
+            font-weight: 500;
+            line-height: 1.25;
+        }
+
+        .toque {
+            font-size: 15px !important;
+            font-weight: 400 !important;
+            opacity: 0.9;
+            animation: pulsa 1.6s ease-in-out infinite;
+        }
+
+        @keyframes pulsa {
+            50% { opacity: 0.45; }
+        }
+
+        /* Quando o cartão abre, a capa gira e some */
+        .cartao.aberto .capa {
+            transform: rotateY(-175deg);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* ---------- A gotinha ---------- */
+        .gotinha {
+            width: 92px;
+            height: 112px;
+            flex-shrink: 0;
+        }
+
+        .gotinha .feliz { display: none; }
+        .gotinha.contente .feliz { display: inline; }
+        .gotinha.contente .triste { display: none; }
+
+        .gotinha.contente {
+            animation: pula 0.5s ease 2;
+        }
+
+        @keyframes pula {
+            50% { transform: translateY(-14px); }
+        }
+
+        /* ---------- Chuva de gotas ---------- */
+        .gota-caindo {
+            position: fixed;
+            top: -40px;
+            font-size: 26px;
+            pointer-events: none;
+            animation: cair linear forwards;
+            z-index: 10;
+        }
+
+        @keyframes cair {
+            to { transform: translateY(110vh) rotate(25deg); }
+        }
+
+        button:focus-visible,
+        .capa:focus-visible {
+            outline: 3px solid var(--coral);
+            outline-offset: 4px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation: none !important;
+                transition-duration: 0.01s !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cartao" id="cartao">
+
+        <!-- ===================== CAPA ===================== -->
+        <div class="capa" id="capa" role="button" tabindex="0" aria-label="Abrir o cartão">
+            <div class="lado frente">
+                <span class="carimbo">URGENTE</span>
+
+                <!-- Cachorrinho sério da capa -->
+                <div class="foto-cachorro">
+                    <span aria-hidden="true">🐕</span>
+                    <img src="https://i.pinimg.com/736x/48/15/9b/48159bd4210342a57f792215afbfda26.jpg" alt="Cachorrinho sério" onerror="this.remove()">
+                </div>
+
+                <p>Ele tem um recado muito sério pra você</p>
+                <p class="toque">toque para abrir</p>
+            </div>
+            <div class="lado verso">psiu…</div>
+        </div>
+
+        <!-- ===================== DENTRO ===================== -->
+        <div class="miolo" id="miolo">
+            <h2>Comunicado oficial</h2>
+
+            <!-- Cachorrinho com balão de fala (só aparece depois de abrir) -->
+            <div class="cachorro" id="cachorro">
+                <div class="foto-cachorro">
+                    <span aria-hidden="true">🐶</span>
+                    <img src="https://i.pinimg.com/736x/8d/aa/11/8daa114dd4e99a2f8c5d7779960acbd0.jpg" alt="Cachorrinho" onerror="this.remove()">
+                </div>
+                <span class="balao" id="balao">Beba água!</span>
+            </div>
+
+            <p class="texto" id="texto">
+                Suas células estão fazendo greve. Os rins abriram reclamação no Reclame Aqui.
+                Favor beber um copo d'água <strong>imediatamente</strong>.
+            </p>
+            <p class="assinatura" id="assinatura">Ass.: Departamento de Hidratação</p>
+
+            <div class="botoes">
+                <button class="bebi" id="bebi" disabled>Bebi! Me deixa em paz</button>
+                <button class="fujao" id="fujao" disabled>Não vou beber</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const cartao     = document.getElementById("cartao");
+        const capa       = document.getElementById("capa");
+        const cachorro   = document.getElementById("cachorro");
+        const balao      = document.getElementById("balao");
+        const texto      = document.getElementById("texto");
+        const assinatura = document.getElementById("assinatura");
+        const fujao      = document.getElementById("fujao");
+
+        // =========================================================
+        // 1. Abrir o cartão (clique ou Enter/Espaço no teclado)
+        // =========================================================
+        const bebi = document.getElementById("bebi");
+        const miolo = document.getElementById("miolo");
+
+        function abrir() {
+            cartao.classList.add("aberto");
+            // os botões só funcionam depois que o envelope abre
+            bebi.disabled = false;
+            fujao.disabled = false;
+        }
+
+        capa.addEventListener("click", abrir);
+        capa.addEventListener("keydown", function (evento) {
+            if (evento.key === "Enter" || evento.key === " ") {
+                evento.preventDefault();
+                abrir();
+            }
+        });
+
+        // =========================================================
+        // 2. Botão "Bebi!": chuva de gotas e respostas engraçadas
+        // =========================================================
+        const RESPOSTAS = [
+            ["Greve cancelada. As células voltaram ao trabalho cantando.", "Ass.: Sindicato das Células"],
+            ["Os rins retiraram a reclamação e deram 5 estrelas.", "Ass.: Rins (os dois)"],
+            ["Seu cérebro acabou de ganhar +10 de inteligência.", "Ass.: Cérebro, agradecido"],
+            ["Uma planta em algum lugar sentiu orgulho de você.", "Ass.: Uma samambaia"],
+            ["Nível de hidratação: lendário.", "Ass.: Departamento de Hidratação"],
+            ["Ok, mas daqui a uma hora eu volto, viu?", "Ass.: O cachorrinho, de olho"]
+        ];
+
+        // O que o cachorrinho fala depois de cada copo
+        const FALAS = ["Isso aí!", "Mais um!", "Boa!", "Au au!", "Orgulho!"];
+
+        let resposta = 0;
+
+        bebi.addEventListener("click", function () {
+            const [frase, quem] = RESPOSTAS[resposta % RESPOSTAS.length];
+            resposta++;
+
+            texto.textContent = frase;
+            assinatura.textContent = quem;
+            balao.textContent = FALAS[Math.floor(Math.random() * FALAS.length)];
+
+            // reinicia a animação de pulinho do cachorrinho
+            cachorro.classList.remove("contente");
+            void cachorro.offsetWidth;
+            cachorro.classList.add("contente");
+
+            chuva();
+        });
+
+        function chuva() {
+            if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+                return;
+            }
+
+            for (let i = 0; i < 28; i++) {
+                const gota = document.createElement("span");
+                gota.className = "gota-caindo";
+                gota.textContent = "💧";
+                gota.style.left = Math.random() * 100 + "vw";
+                gota.style.animationDuration = 1.2 + Math.random() * 1.5 + "s";
+                gota.style.animationDelay = Math.random() * 0.6 + "s";
+                document.body.appendChild(gota);
+                // apaga a gota depois que ela cai
+                setTimeout(function () { gota.remove(); }, 3500);
+            }
+        }
+
+        // =========================================================
+        // 3. Botão "Não vou beber": foge SEMPRE, nunca dá para clicar
+        // =========================================================
+        const FUGAS = [
+            "Não vou beber",
+            "Volta aqui!",
+            "Não adianta fugir",
+            "Tô de olho",
+            "Nem tenta",
+            "Muito lento!",
+            "Bebe água logo",
+            "Hahaha"
+        ];
+
+        let fugas = 0;
+
+        function fugir(evento) {
+            if (evento) {
+                evento.preventDefault();
+            }
+            fugas++;
+            fujao.textContent = FUGAS[fugas % FUGAS.length];
+
+            // Descobre onde o botão estaria sem o deslocamento (posição original)
+            const deslocamento = fujao.style.transform;
+            fujao.style.transition = "none";
+            fujao.style.transform = "none";
+            const original = fujao.getBoundingClientRect();
+            fujao.style.transform = deslocamento;
+            void fujao.offsetWidth;          // força o navegador a aplicar antes de animar
+            fujao.style.transition = "";
+
+            const atual = fujao.getBoundingClientRect();
+            const area  = miolo.getBoundingClientRect();
+            const margem = 12;
+
+            // Sorteia um lugar dentro do cartão, longe de onde ele está agora
+            let x, y, tentativas = 0;
+            do {
+                x = area.left + margem + Math.random() * (area.width  - original.width  - margem * 2);
+                y = area.top  + margem + Math.random() * (area.height - original.height - margem * 2);
+                tentativas++;
+            } while (Math.hypot(x - atual.left, y - atual.top) < 120 && tentativas < 20);
+
+            const giro = (Math.random() - 0.5) * 20;
+            fujao.style.transform = `translate(${x - original.left}px, ${y - original.top}px) rotate(${giro}deg)`;
+        }
+
+        // Foge de tudo: mouse chegando perto, dedo encostando, clique e até a tecla Tab
+        fujao.addEventListener("mouseenter", fugir);
+        fujao.addEventListener("pointerdown", fugir);
+        fujao.addEventListener("touchstart", fugir, { passive: false });
+        fujao.addEventListener("focus", function () {
+            fugir();
+            fujao.blur();   // tira o foco: nem pelo teclado dá para apertar
+        });
+        fujao.addEventListener("click", function (evento) {
+            evento.preventDefault();
+            fugir();
+        });
+    </script>
+</body>
+</html>
